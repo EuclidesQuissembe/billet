@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+  apache:
+    build: .
+    container_name: apache
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html/
+    networks:
+      - billet
+
+  db:
+    image: mysql
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_PASSWORD=
+      - MYSQL_USER=
+      - SERVICE_TAGS=dev
+      - SERVICE_NAME=mysql
+    volumes:
+      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+    networks:
+      - billet
+
+networks:
+  nzooji:
+    name: billet-network
+    driver: bridge

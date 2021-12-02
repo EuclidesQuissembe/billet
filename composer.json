@@ -1,0 +1,38 @@
+{
+  "name": "nzooji/nzooji",
+  "description": "Official Web Site",
+  "minimum-stability": "stable",
+  "authors": [
+    {
+      "name": "Euclides Bernardo",
+      "email": "euclidesquissembebernado@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Source\\": "source/"
+    },
+    "files": [
+      "source/Boot/Config.php",
+      "source/Boot/Helpers.php"
+    ]
+  },
+  "require": {
+    "php": "^7.4",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-exif": "*",
+    "ext-gd": "*",
+    "ext-curl": "*",
+    "ext-pdo": "*",
+    "firebase/php-jwt": "^5.2",
+    "coffeecode/router": "^1.0",
+    "coffeecode/paginator": "^1.0",
+    "coffeecode/uploader": "^1.0",
+    "league/plates": "^3.4.0",
+    "coffeecode/cropper": "^1.0",
+    "coffeecode/optimizer": "^1.0",
+    "phpmailer/phpmailer": "~6.0"
+  }
+}
