@@ -31,13 +31,13 @@ class Api
     }
 
     /**
-     * @param array|null $data
+     * @param null $data
      * @return Api
      */
-    protected function back(array $data = null): Api
+    protected function back($data = null): Api
     {
         if (!empty($this->response)) {
-            $this->response = ($data ? array_merge($this->response, $data) : $this->response);
+            $this->response = ($data ? array_merge($this->response, (array)$data) : $this->response);
             echo json_encode($this->response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
             return $this;
         }
