@@ -3,6 +3,7 @@
 namespace Source\Controllers;
 
 use Source\Core\Auth;
+use Source\Models\Billet\Billet;
 use Source\Models\Payer\Payer;
 use Source\Models\Payer\PayerAddress;
 use Source\Models\Payer\PayerComplement;
@@ -138,28 +139,69 @@ class Payers extends RootApi
         $payersData = (new Payer())->find('user_id = :id', "id={$user->id}")->fetch(true);
 
         $payers = [];
-        foreach ($payersData as $payer) {
-            $payer->address = (new PayerAddress())
-                ->find('payer_id = :id', "id={$payer->id}")
-                ->fetch()
-                ->data();
+        if ($payersData) {
+            foreach ($payersData as $payer) {
+                $payer->address = (new PayerAddress())
+                    ->find('payer_id = :id', "id={$payer->id}")
+                    ->fetch()
+                    ->data();
 
-            $number = (new PayerNumber())->find('payer_id = :id', "id={$payer->id}")->fetch();
+                $number = (new PayerNumber())->find('payer_id = :id', "id={$payer->id}")->fetch();
 
-            if ($number) {
-                $payer->number = $number->data();
+                if ($number) {
+                    $payer->number = $number->data();
+                }
+
+                $complement = (new PayerComplement())->find('payer_id = :id', "id={$payer->id}")->fetch();
+
+                if ($complement) {
+                    $payer->complement = $complement->data();
+                }
+
+                $payer->document_path = storage($payer->document_path);
+                $payers[] = $payer->data();
             }
-
-            $complement = (new PayerComplement())->find('payer_id = :id', "id={$payer->id}")->fetch();
-
-            if ($complement) {
-                $payer->complement = $complement->data();
-            }
-
-            $payer->document_path = storage($payer->document_path);
-            $payers[] = $payer->data();
         }
 
         $this->call(200, true)->back($payers);
+    }
+
+    public function delete(array $data)
+    {
+        if (!$payerId = filter_var($data['payer_id'], FILTER_VALIDATE_INT)) {
+            $this->call(400, false, 'O id do pagador deve ser um número')->back();
+            return;
+        }
+
+        $payer = (new Payer())->findById($payerId);
+
+        if (!$payer) {
+            $this->call(500, false, 'Pagador não encontrado')->back();
+            return;
+        }
+
+        $user = Auth::user();
+
+        $billets = (new Billet())->find(
+            'user_id = :user AND payer_id = :payer',
+            "user={$user->id}&payer={$payerId}"
+        )->fetch(true);
+
+        if ($billets) {
+            $this
+                ->call(500, false, 'Este pagador não pode ser eliminado, pois possui boletos')
+                ->back();
+            return;
+        }
+
+        (new PayerAddress())->delete('payer_id', $payerId);
+        (new PayerComplement())->delete('payer_id', $payerId);
+        (new PayerNumber())->delete('payer_id', $payerId);
+
+        if (!$payer->destroy()) {
+            $this->call(500, false, 'Houve um erro ao eliminar o pagador')->back();
+            return;
+        }
+        $this->call(200, true, 'Pagador eliminado com sucesso')->back();
     }
 }
