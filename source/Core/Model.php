@@ -4,6 +4,7 @@
 namespace Source\Core;
 
 use Source\Core\Connect;
+use Source\Support\Message;
 
 /**
  * Class Model
@@ -51,6 +52,10 @@ abstract class Model
     /** @var $fail */
     protected $fail;
 
+    /** @var $message */
+    protected $message;
+
+
     /**
      * @param $name
      * @return null
@@ -97,6 +102,8 @@ abstract class Model
         $this->table = $table;
         $this->protected = array_merge($protected, ["created_at", "updated_at"]);
         $this->required = $required;
+
+        $this->message = new Message();
     }
 
     /**
@@ -113,6 +120,14 @@ abstract class Model
     public function fail()
     {
         return $this->fail;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function message()
+    {
+        return $this->message;
     }
 
     /**
@@ -322,10 +337,10 @@ abstract class Model
 
     /**
      * @param string $key
-     * @param string $value
+     * @param int $value
      * @return bool
      */
-    public function delete(string $key, string $value): bool
+    public function delete(string $key, int $value): bool
     {
         try {
             $stmt = Connect::getInstance()->prepare("DELETE FROM {$this->table} WHERE {$key} = :key");
@@ -352,7 +367,7 @@ abstract class Model
     public function save(): bool
     {
         if (!$this->required()) {
-            $this->message->info("Preencha todos os campos");
+            $this->message->info("Informe todos os campos");
             return false;
         }
 
