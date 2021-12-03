@@ -32,17 +32,18 @@ class Api
 
     /**
      * @param null $data
+     * @param string $prop
      * @return Api
      */
-    protected function back($data = null): Api
+    protected function back($data = null, string $prop = 'data'): Api
     {
         if (!empty($this->response)) {
-            $this->response = ($data ? array_merge($this->response, (array)$data) : $this->response);
+            $this->response = ($data ? array_merge($this->response, [$prop => (array)$data]) : $this->response);
             echo json_encode($this->response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
             return $this;
         }
 
-        echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+        echo json_encode([$prop => $data], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
         return $this;
     }
 }
