@@ -16,13 +16,10 @@ services:
     image: mysql
     container_name: db
     restart: unless-stopped
+    ports:
+      - "3306:3306"
     environment:
-      - MYSQL_DATABASE=
-      - MYSQL_ROOT_PASSWORD=
-      - MYSQL_PASSWORD=
-      - MYSQL_USER=
-      - SERVICE_TAGS=dev
-      - SERVICE_NAME=mysql
+      - MYSQL_ROOT_PASSWORD=billet.password
     volumes:
       - ./docker-compose/mysql:/docker-entrypoint-initdb.d
     networks:
@@ -31,4 +28,3 @@ services:
 networks:
   billet:
     name: billet-network
-    driver: bridge
