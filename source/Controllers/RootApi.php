@@ -45,7 +45,7 @@ class RootApi extends Api
             try {
                 $payload = (new JWTAuth())->decode($token);
 
-                (new Auth($payload->userContact));
+                (new Auth($payload->user_id));
             } catch (SignatureInvalidException $exception) {
                 $this->call(
                     401,
