@@ -4,7 +4,6 @@
 namespace Source\Core;
 
 use Source\Core\Connect;
-use Source\Support\Message;
 
 /**
  * Class Model
@@ -52,10 +51,6 @@ abstract class Model
     /** @var $fail */
     protected $fail;
 
-    /** @var $message */
-    protected $message;
-
-
     /**
      * @param $name
      * @return null
@@ -102,8 +97,6 @@ abstract class Model
         $this->table = $table;
         $this->protected = array_merge($protected, ["created_at", "updated_at"]);
         $this->required = $required;
-
-        $this->message = new Message();
     }
 
     /**
@@ -120,14 +113,6 @@ abstract class Model
     public function fail()
     {
         return $this->fail;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function message()
-    {
-        return $this->message;
     }
 
     /**
