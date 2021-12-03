@@ -1,7 +1,5 @@
 <?php
 
-use PHPMailer\PHPMailer\PHPMailer;
-
 /**
  * PROJECT URLs
  */
@@ -12,14 +10,14 @@ const CONF_URL_TEST = "http://localhost:8000";
 /**
  * DATABASE
  */
-const CONF_DB_HOST = "localhost";
-const CONF_DB_PASS = "";
-const CONF_DB_NAME = "";
+const CONF_DB_HOST = "db";
+const CONF_DB_PASS = "billet.password";
+const CONF_DB_NAME = "billet";
 
 if (strpos($_SERVER['HTTP_HOST'], 'localhost')) {
     define("CONF_DB_USER", "root");
 } else {
-    define("CONF_DB_USER", "");
+    define("CONF_DB_USER", "root");
 }
 
 const CONF_DB_OPTIONS = [
