@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `payers` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id` INT UNSIGNED NOT NULL,
     `name` VARCHAR (40) NOT NULL,
-    `document_path` VARCHAR (255) NOT NULL,
+    `document_path` VARCHAR (255) NULL,
     `email` VARCHAR (255) NOT NULL UNIQUE,
     `cell_phone` VARCHAR (20) NOT NULL,
     `day` INT NOT NULL,
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `payers_numbers` (
 CREATE TABLE IF NOT EXISTS `payers_complements` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `payer_id` INT UNSIGNED NOT NULL,
-    `complement` INT NOT NULL,
+    `complement` VARCHAR (30) NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
