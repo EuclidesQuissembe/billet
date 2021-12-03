@@ -35,7 +35,7 @@ class Payers extends RootApi
             return;
         }
 
-        if (empty($_FILES['document']) || $_FILES['document']['error'] != 0) {
+        if (empty($_FILES['document']) || $_FILES['document']['error'] !== 0) {
             $this->call(400, false, 'Envie o documento do pagador')->back();
             return;
         }
@@ -164,6 +164,86 @@ class Payers extends RootApi
         }
 
         $this->call(200, true)->back($payers);
+    }
+
+    public function update(array $data): void
+    {
+        $data = filter_var_array($data, FILTER_SANITIZE_STRIPPED);
+
+        $payer = (new Payer())->findById($data['payer_id']);
+
+        if (!$payer) {
+            $this->call(500, false, 'Pagador não encontrado')->back();
+            return;
+        }
+
+        $payer->name = $data['name'] ?? $payer->name;
+        $payer->email = $data['email'] ?? $payer->email;
+        $payer->cell_phone = $data['cell_phone'] ?? $payer->cell_phone;
+        $payer->day = $data['day'] ?? $payer->day;
+        $payer->month = $data['month'] ?? $payer->month;
+        $payer->year = $data['year'] ?? $payer->year;
+
+        if (!empty($_FILES['document']) && $_FILES['document']['error'] === 0) {
+            list($type) = explode('/', $_FILES['document']['type']);
+
+            if ($type === 'image') {
+                $documentPath = substr(
+                    (new Upload('payers'))->image($_FILES['document'], $payer->name),
+                    strlen('storage/')
+                );
+            } else {
+                $documentPath = substr(
+                    (new Upload('payers'))->file($_FILES['document'], $payer->name),
+                    strlen('storage/')
+                );
+            }
+
+            $payer->document_path = $documentPath;
+        }
+
+        if (!$payer->save()) {
+            $this->call(500, false, $payer->message()->json())->back();
+            return;
+        }
+
+        // Address
+        $address = (new PayerAddress())->find('payer_id = :id', "id={$payer->id}")->fetch();
+        $address->cep = $data['cep'] ?? $address->cep;
+        $address->street = $data['street'] ?? $address->street;
+        $address->district = $data['district'] ?? $address->district;
+        $address->city = $data['city'] ?? $address->city;
+        $address->state = $data['state'] ?? $address->state;
+
+        if (!$address->save()) {
+            $this->call(500, false, $address->message()->json())->back();
+            return;
+        }
+
+        // Complement
+        $complement = (new PayerComplement())->find('payer_id = :id', "id={$payer->id}")->fetch();
+        $complement->complement = $data['complement'] ?? $complement->complement;
+
+        if (!$complement->save()) {
+            $this->call(500, false, $complement->message()->json())->back();
+            return;
+        }
+
+        // Number
+        $number = (new PayerNumber())->find('payer_id = :id', "id={$payer->id}")->fetch();
+        $number->number = $data['number'] ?? $number->number;
+
+        if (!$number->save()) {
+            $this->call(500, false, $number->message()->json())->back();
+            return;
+        }
+
+        $payer->address = $address->data();
+        $payer->number = $number->data();
+        $payer->complement = $complement->data();
+        $payer->document_path = storage($payer->document_path);
+
+        $this->call(200, true)->back($payer->data());
     }
 
     public function delete(array $data)
