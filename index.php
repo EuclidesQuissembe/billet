@@ -24,6 +24,8 @@ $route->post('/boleto/create', 'Billets:create');
 // Payers
 $route->post('/pagador/create', 'Payers:create');
 $route->get('/pagador/me', 'Payers:all');
+$route->post('/pagador/delete/{payer_id}', 'Payers:delete');
+$route->post('/pagador/update/{payer_id}', 'Payers:update');
 
 // Users
 $route->post('/me', 'Users:me');
