@@ -1,6 +1,6 @@
 {
-  "name": "nzooji/nzooji",
-  "description": "Official Web Site",
+  "name": "euclidesquissembe/billet",
+  "description": "API",
   "minimum-stability": "stable",
   "authors": [
     {
@@ -30,9 +30,6 @@
     "coffeecode/router": "^1.0",
     "coffeecode/paginator": "^1.0",
     "coffeecode/uploader": "^1.0",
-    "league/plates": "^3.4.0",
-    "coffeecode/cropper": "^1.0",
-    "coffeecode/optimizer": "^1.0",
     "phpmailer/phpmailer": "~6.0"
   }
 }
