@@ -6,7 +6,6 @@
 const CONF_URL_BASE = "http://localhost:8000";
 const CONF_URL_TEST = "http://localhost:8000";
 
-
 /**
  * DATABASE
  */
@@ -27,7 +26,6 @@ const CONF_DB_OPTIONS = [
     \PDO::ATTR_CASE => \PDO::CASE_NATURAL
 ];
 
-
 /**
  * PASSWORD
  */
@@ -36,11 +34,14 @@ const CONF_PASSWORD_MAX_LEN = 40;
 const CONF_PASSWORD_MIN_LEN = 8;
 const CONF_PASSWORD_OPTIONS = ['cost' => 10];
 
-
+// JWT
+const CONF_JWT_ALG = "HS256";
+const CONF_JWT_ALGS = [CONF_JWT_ALG];
+const CONF_JWT_KEY = "billet";
 
 /**
- * DATE
+ * UPLOAD
  */
-const CONF_DATE_FORMAT = 'd \d\e M \d\e Y  à\s H:i:s';
-const CONF_DATE_SERVER = 'Y-m-d H:i:s';
-const CONF_DATE_TIMEZONE = 'Africa/Luanda';
+const CONF_UPLOAD_DIR = "storage";
+const CONF_UPLOAD_IMAGE_DIR = "images";
+const CONF_UPLOAD_FILE_DIR = "files";
