@@ -29,6 +29,6 @@ services:
       - billet
 
 networks:
-  nzooji:
+  billet:
     name: billet-network
     driver: bridge
