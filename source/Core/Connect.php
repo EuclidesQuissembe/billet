@@ -3,6 +3,8 @@
 
 namespace Source\Core;
 
+use PDO;
+
 /**
  * Class Connect
  *
@@ -11,7 +13,7 @@ namespace Source\Core;
 class Connect
 {
     /**
-     * @var
+     * @var PDO|null
      */
     private static $instance;
 
@@ -21,13 +23,13 @@ class Connect
     private static $fail;
 
     /**
-     * @return \PDO
+     * @return PDO
      */
-    public static function getInstance(): \PDO
+    public static function getInstance(): ?PDO
     {
         try {
             if (empty(self::$instance)) {
-                self::$instance = new \PDO(
+                self::$instance = new PDO(
                     "mysql:host=" . CONF_DB_HOST . ";dbname=" . CONF_DB_NAME . ";charset=utf8mb4",
                     CONF_DB_USER,
                     CONF_DB_PASS,
