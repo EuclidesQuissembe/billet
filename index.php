@@ -7,25 +7,26 @@ ob_start();
 require __DIR__ . "/vendor/autoload.php";
 
 $route = new Router(url());
-$route->namespace("Source\App");
+$route->namespace("Source\Controllers");
 
 /**
- * Web Routes
+ * API Routes
  */
-$route->group(null);
-$route->get('/', 'Web:home', 'web.home');
-$route->get('/sobre-nos', 'Web:about', 'web.about');
-$route->get('/contactos', 'Web:contacts', 'web.contacts');
-$route->get('/faqs', 'Web:faqs', 'web.faqs');
-$route->get('/blog', 'Web:blog', 'web.blog');
-$route->get('/casos-de-uso', 'Web:cases', 'web.cases');
+$route->group('api');
 
-/**
- * Errors
- */
-$route->namespace('Source\App');
-$route->group('ops');
-$route->get('/{err_code}', 'Web:error', 'web.error');
+// Auth
+$route->post('/login', 'Access:login');
+$route->post('/register', 'Access:register');
+
+// Billets
+$route->post('/boleto/create', 'Billets:create');
+
+// Payers
+$route->post('/pagador/create', 'Payers:create');
+$route->get('/pagador/me', 'Payers:all');
+
+// Users
+$route->post('/me', 'Users:me');
 
 /**
  * Dispatch
@@ -34,10 +35,19 @@ $route->dispatch();
 
 
 /**
- * Error
+ * Error Endpoint
  */
 if ($route->error()) {
-    $route->redirect("/ops/{$route->error()}");
+    header('Content-Type: application/json;charset=utf8');
+    header('HTTP/1.1 404 Not Found');
+
+    $json = [
+        "success" => false,
+        "message" => "Endpoint not found"
+    ];
+
+    echo json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    return;
 }
 
 ob_end_flush();
