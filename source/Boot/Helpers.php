@@ -119,3 +119,17 @@ function str_slug(string $string): string
         )
     );
 }
+
+/**
+ * @param string $file
+ *
+ * @return string
+ */
+function storage(string $file): string
+{
+    if (strpos($_SERVER['HTTP_HOST'], "localhost")) {
+        return CONF_URL_TEST . "/storage/" . ($file[0] == "/" ? substr($file, 1) : $file);
+    }
+
+    return CONF_URL_BASE . "/storage/" . ($file[0] == "/" ? substr($file, 1) : $file);
+}
