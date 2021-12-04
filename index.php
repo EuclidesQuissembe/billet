@@ -19,6 +19,7 @@ $route->post('/login', 'Access:login');
 $route->post('/register', 'Access:register');
 
 // Billets
+$route->get('/boleto/me', 'Billets:all');
 $route->post('/boleto/create', 'Billets:create');
 
 // Payers
