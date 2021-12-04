@@ -9,6 +9,7 @@ use Source\Models\Billet\BilletFee;
 use Source\Models\Billet\BilletInstruction;
 use Source\Models\Billet\BilletReference;
 use Source\Models\Billet\BilletTicketFine;
+use Source\Models\Payer\Payer;
 
 class Billets extends RootApi
 {
@@ -24,6 +25,67 @@ class Billets extends RootApi
             )->back();
             return;
         }
+    }
+
+    public function index(array $data): void
+    {
+        if (!$payerId = filter_var($data['payer_id'], FILTER_VALIDATE_INT)) {
+            $this->call(500, false, 'O id do pagador deve ser inteiro')->back();
+            return;
+        }
+
+        $payer = (new Payer())->findById($payerId);
+
+        if (!$payer) {
+            $this->call(500, false, 'Pagador não encontrado')->back();
+            return;
+        }
+
+        $user = Auth::user();
+
+        $billetsData = (new Billet())
+            ->find('user_id = :id AND payer_id = :p', "id={$user->id}&p={$payerId}")
+            ->fetch(true);
+
+        $billets = [];
+        if ($billetsData) {
+            foreach ($billetsData as $billet) {
+                $fee = (new BilletFee())->find('billet_id = :id', "id={$billet->id}")->fetch();
+                $ticket = (new BilletTicketFine())->find('billet_id = :id', "id={$billet->id}")->fetch();
+                $discount = (new BilletDiscounts())->find('billet_id = :id', "id={$billet->id}")->fetch();
+                $reference = (new BilletReference())->find('billet_id = :id', "id={$billet->id}")->fetch();
+                $instructions = (new BilletInstruction())->find('billet_id = :id', "id={$billet->id}")->fetch(true);
+
+                if($fee) {
+                    $billet->fee = $fee->data();
+                }
+
+                if ($ticket) {
+                    $billet->ticket = $ticket->data();
+                }
+
+                if ($discount) {
+                    $billet->discount = $discount->data();
+                }
+
+                if ($reference) {
+                    $billet->reference = $reference->data();
+                }
+
+                if ($instructions) {
+                    $ins = [];
+                    foreach ($instructions as $instruction) {
+                        $ins[] = $instruction->data();
+                    }
+
+                    $billet->instructions = $ins;
+                }
+
+                $billets[] = $billet->data();
+            }
+        }
+
+        $this->call(200, true)->back($billets);
     }
 
     public function all()
@@ -169,5 +231,32 @@ class Billets extends RootApi
         }
 
         $this->call(201, true)->back($billet->data());
+    }
+
+    public function delete(array $data): void
+    {
+        if (!$billetId = filter_var($data['billet_id'], FILTER_VALIDATE_INT)) {
+            $this->call(400, false, 'O id do boleto deve ser um número')->back();
+            return;
+        }
+
+        $billet = (new Billet())->findById($billetId);
+
+        if (!$billet) {
+            $this->call(500, false, 'Boleto não encontrado')->back();
+            return;
+        }
+
+        (new BilletInstruction())->delete('billet_id', $billetId);
+        (new BilletTicketFine())->delete('billet_id', $billetId);
+        (new BilletReference())->delete('billet_id', $billetId);
+        (new BilletFee())->delete('billet_id', $billetId);
+        (new BilletDiscounts())->delete('billet_id', $billetId);
+
+        if (!$billet->destroy()) {
+            $this->call(500, false, 'Houve um erro ao eliminar o boleto')->back();
+            return;
+        }
+        $this->call(200, true, 'Boleto eliminado com sucesso')->back();
     }
 }
