@@ -5,6 +5,12 @@
       <sourceFolder url="file://$MODULE_DIR$/source" isTestSource="false" packagePrefix="Source\" />
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/coffeecode/paginator" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/coffeecode/router" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/coffeecode/uploader" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/firebase/php-jwt" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpmailer/phpmailer" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
