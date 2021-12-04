@@ -26,6 +26,53 @@ class Billets extends RootApi
         }
     }
 
+    public function all()
+    {
+        $user = Auth::user();
+
+        $billetsData = (new Billet())->find('user_id = :id', "id={$user->id}")->fetch(true);
+
+        $billets = [];
+        if ($billetsData) {
+            foreach ($billetsData as $billet) {
+                $fee = (new BilletFee())->find('billet_id = :id', "id={$billet->id}")->fetch();
+                $ticket = (new BilletTicketFine())->find('billet_id = :id', "id={$billet->id}")->fetch();
+                $discount = (new BilletDiscounts())->find('billet_id = :id', "id={$billet->id}")->fetch();
+                $reference = (new BilletReference())->find('billet_id = :id', "id={$billet->id}")->fetch();
+                $instructions = (new BilletInstruction())->find('billet_id = :id', "id={$billet->id}")->fetch(true);
+
+                if($fee) {
+                    $billet->fee = $fee->data();
+                }
+
+                if ($ticket) {
+                    $billet->ticket = $ticket->data();
+                }
+
+                if ($discount) {
+                    $billet->discount = $discount->data();
+                }
+
+                if ($reference) {
+                    $billet->reference = $reference->data();
+                }
+
+                if ($instructions) {
+                    $ins = [];
+                    foreach ($instructions as $instruction) {
+                        $ins[] = $instruction->data();
+                    }
+
+                    $billet->instructions = $ins;
+                }
+
+                $billets[] = $billet->data();
+            }
+        }
+
+        $this->call(200, true)->back($billets);
+    }
+
     public function create(): void
     {
         $data = filter_var_array((array)(json_decode(file_get_contents("php://input"))), FILTER_SANITIZE_STRIPPED);
