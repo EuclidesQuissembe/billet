@@ -17,6 +17,15 @@ class Users extends RootApi
             return;
         }
 
+        if (!Auth::user()) {
+            $this->call(
+                500,
+                false,
+                "Precisas estar autenticado para ter acesso"
+            )->back();
+            return;
+        }
+
         $user = Auth::user();
 
         unset($user->data()->password_hash);

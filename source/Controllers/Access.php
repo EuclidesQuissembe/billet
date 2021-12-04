@@ -37,6 +37,7 @@ class Access extends RootApi
 
         // JWT (JSON Web Token)
         $payload = [
+            'exp' => time() + (60 * 10),
             'iss' => 'localhost/api',
             'user_id' => $user->id
         ];
@@ -79,8 +80,7 @@ class Access extends RootApi
 
         // JWT (JSON Web Token)
         $payload = [
-            'iat' => time(),
-            'exp' => '10s',
+            'exp' => time() + (60 * 10),
             'iss' => 'localhost/api',
             'user_id' => $user->id
         ];

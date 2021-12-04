@@ -13,10 +13,8 @@ use Source\Models\Payer\Payer;
 
 class Billets extends RootApi
 {
-    public function __construct()
+    public function index(array $data): void
     {
-        parent::__construct();
-
         if (!Auth::user()) {
             $this->call(
                 500,
@@ -25,10 +23,7 @@ class Billets extends RootApi
             )->back();
             return;
         }
-    }
 
-    public function index(array $data): void
-    {
         if (!$payerId = filter_var($data['payer_id'], FILTER_VALIDATE_INT)) {
             $this->call(500, false, 'O id do pagador deve ser inteiro')->back();
             return;
@@ -90,6 +85,15 @@ class Billets extends RootApi
 
     public function all()
     {
+        if (!Auth::user()) {
+            $this->call(
+                500,
+                false,
+                "Precisas estar autenticado para ter acesso"
+            )->back();
+            return;
+        }
+
         $user = Auth::user();
 
         $billetsData = (new Billet())->find('user_id = :id', "id={$user->id}")->fetch(true);
@@ -137,6 +141,15 @@ class Billets extends RootApi
 
     public function create(): void
     {
+        if (!Auth::user()) {
+            $this->call(
+                500,
+                false,
+                "Precisas estar autenticado para ter acesso"
+            )->back();
+            return;
+        }
+
         $data = filter_var_array((array)(json_decode(file_get_contents("php://input"))), FILTER_SANITIZE_STRIPPED);
 
         $billet = new Billet();
@@ -235,6 +248,15 @@ class Billets extends RootApi
 
     public function update()
     {
+        if (!Auth::user()) {
+            $this->call(
+                500,
+                false,
+                "Precisas estar autenticado para ter acesso"
+            )->back();
+            return;
+        }
+
         $data = filter_var_array((array)(json_decode(file_get_contents("php://input"))), FILTER_SANITIZE_STRIPPED);
 
         $billet = (new Billet())->findById($data['billet_id']);
@@ -316,6 +338,15 @@ class Billets extends RootApi
 
     public function delete(array $data): void
     {
+        if (!Auth::user()) {
+            $this->call(
+                500,
+                false,
+                "Precisas estar autenticado para ter acesso"
+            )->back();
+            return;
+        }
+
         if (!$billetId = filter_var($data['billet_id'], FILTER_VALIDATE_INT)) {
             $this->call(400, false, 'O id do boleto deve ser um número')->back();
             return;

@@ -12,10 +12,8 @@ use Source\Support\Upload;
 
 class Payers extends RootApi
 {
-    public function __construct()
+    public function create(array $data): void
     {
-        parent::__construct();
-
         if (!Auth::user()) {
             $this->call(
                 500,
@@ -24,10 +22,7 @@ class Payers extends RootApi
             )->back();
             return;
         }
-    }
 
-    public function create(array $data): void
-    {
         $data = filter_var_array($data, FILTER_SANITIZE_STRIPPED);
 
         if (in_array("", $data)) {
@@ -134,6 +129,15 @@ class Payers extends RootApi
 
     public function all(): void
     {
+        if (!Auth::user()) {
+            $this->call(
+                500,
+                false,
+                "Precisas estar autenticado para ter acesso"
+            )->back();
+            return;
+        }
+
         $user = Auth::user();
 
         $payersData = (new Payer())->find('user_id = :id', "id={$user->id}")->fetch(true);
@@ -168,6 +172,15 @@ class Payers extends RootApi
 
     public function update(array $data): void
     {
+        if (!Auth::user()) {
+            $this->call(
+                500,
+                false,
+                "Precisas estar autenticado para ter acesso"
+            )->back();
+            return;
+        }
+
         $data = filter_var_array($data, FILTER_SANITIZE_STRIPPED);
 
         $payer = (new Payer())->findById($data['payer_id']);
@@ -248,6 +261,15 @@ class Payers extends RootApi
 
     public function delete(array $data)
     {
+        if (!Auth::user()) {
+            $this->call(
+                500,
+                false,
+                "Precisas estar autenticado para ter acesso"
+            )->back();
+            return;
+        }
+
         if (!$payerId = filter_var($data['payer_id'], FILTER_VALIDATE_INT)) {
             $this->call(400, false, 'O id do pagador deve ser um número')->back();
             return;
