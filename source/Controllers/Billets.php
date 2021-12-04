@@ -233,6 +233,87 @@ class Billets extends RootApi
         $this->call(201, true)->back($billet->data());
     }
 
+    public function update()
+    {
+        $data = filter_var_array((array)(json_decode(file_get_contents("php://input"))), FILTER_SANITIZE_STRIPPED);
+
+        $billet = (new Billet())->findById($data['billet_id']);
+
+        $billet->due_date = $data['due_date'] ?? $billet->due_date;
+        $billet->price = $data['price'] ?? $billet->price;
+        $billet->description = $data['description'] ?? $billet->description;
+
+        if (!$billet->save()) {
+            $this->call(500, false, $billet->message()->json())->back();
+            return;
+        }
+
+        $ticket = (new BilletTicketFine())->find('billet_id = :id', "id={$billet->id}")->fetch();
+        $ticket->type = $data['ticket_type'] ?? $ticket->type;
+        $ticket->value = $data['ticket_value'] ?? $ticket->value;
+
+        if (!$ticket->save()) {
+            $this->call(500, false, $ticket->message()->json())->back();
+            return;
+        }
+
+        $billet->ticket = $ticket->data();
+
+        $fee = (new BilletFee())->find('billet_id = :id', "id={$billet->id}")->fetch();
+        $fee->type = $data['fee_type'] ?? $fee->type;
+        $fee->value = $data['fee_value'] ?? $fee->value;
+
+        if (!$fee->save()) {
+            $this->call(500, false, $fee->message()->json())->back();
+            return;
+        }
+
+        $billet->fee = $fee->data();
+
+        $discount = (new BilletDiscounts())->find('billet_id = :id', "id={$billet->id}")->fetch();
+
+        $discount->type = $data['discount_type'] ?? $discount->type;
+        $discount->value = $data['discount_value'] ?? $discount->value;
+        $discount->deadline_date = $data['discount_deadline'] ?? $discount->deadline_date;
+
+        if (!$discount->save()) {
+            $this->call(500, false, $discount->message()->json())->back();
+            return;
+        }
+
+        $billet->discount = $discount->data();
+
+        if ($data['instructions']) {
+            $instructions = [];
+
+            (new BilletInstruction())->delete('billet_id', $billet->id);
+
+            foreach ($data['instructions'] as $instruction) {
+                $newInstruction = new BilletInstruction();
+                $newInstruction->billet_id = $billet->id;
+                $newInstruction->instruction = $instruction;
+
+                $newInstruction->save();
+
+                $instructions[] = $instruction;
+            }
+
+            $billet->instructions = $instructions;
+        }
+
+        $reference = (new BilletReference())->find('billet_id = :id', "id={$billet->id}")->fetch();
+        $reference->reference = $data['reference'] ?? $reference->reference;
+
+        if (!$reference->save()) {
+            $this->call(500, false, $reference->message()->json())->back();
+            return;
+        }
+
+        $billet->reference = $reference->data();
+
+        $this->call(200, true)->back($billet->data());
+    }
+
     public function delete(array $data): void
     {
         if (!$billetId = filter_var($data['billet_id'], FILTER_VALIDATE_INT)) {
